@@ -61,6 +61,26 @@ export async function placeOrder(
             return { success: false, message: 'Your cart is empty.' }
         }
 
+        // Validate stock availability
+        for (const item of cartItems) {
+            const { data: product } = await supabase
+                .from('products')
+                .select('stock_quantity, name')
+                .eq('id', item.product.id)
+                .single()
+
+            if (!product) {
+                return { success: false, message: `Product with ID ${item.product.id} not found.` }
+            }
+
+            if ((product.stock_quantity ?? 0) < item.quantity) {
+                return {
+                    success: false,
+                    message: `Sorry, only ${product.stock_quantity ?? 0} units of "${product.name}" are available.`
+                }
+            }
+        }
+
         // Calculate total
         const totalAmount = cartItems.reduce(
             (sum, item) => sum + (item.product.price ?? 0) * item.quantity,

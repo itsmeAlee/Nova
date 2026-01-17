@@ -32,9 +32,9 @@ export default function CheckoutPage() {
         return (
             <div className="container mx-auto px-4 py-16">
                 <div className="card-fresh max-w-md mx-auto text-center py-12">
-                    <ShoppingBag className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Your cart is empty</h1>
-                    <p className="text-slate-500 mb-6">Add some products to get started!</p>
+                    <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <h1 className="text-2xl font-bold text-foreground mb-2">Your cart is empty</h1>
+                    <p className="text-muted-foreground mb-6">Add some products to get started!</p>
                     <button
                         type="button"
                         onClick={() => window.location.href = '/shop'}
@@ -52,14 +52,14 @@ export default function CheckoutPage() {
     if (state?.success) {
         return (
             <div className="container mx-auto px-4 py-16">
-                <div className="max-w-md mx-auto text-center space-y-4 p-8 bg-emerald-50 rounded-xl border border-emerald-100">
+                <div className="max-w-md mx-auto text-center space-y-4 p-8 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
                     <div className="flex justify-center">
-                        <div className="p-3 bg-emerald-100 rounded-full">
+                        <div className="p-3 bg-emerald-100 dark:bg-emerald-900/40 rounded-full">
                             <span className="text-4xl">🎉</span>
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-emerald-800">Order Placed Successfully!</h2>
-                    <p className="text-slate-600">{state.message}</p>
+                    <h2 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200">Order Placed Successfully!</h2>
+                    <p className="text-slate-600 dark:text-emerald-100/80">{state.message}</p>
 
                     <div className="pt-4">
                         <button
@@ -80,13 +80,13 @@ export default function CheckoutPage() {
             {/* Back Button */}
             <Link
                 href="/shop"
-                className="inline-flex items-center gap-1 text-slate-600 hover:text-emerald-600 mb-6 transition-colors"
+                className="inline-flex items-center gap-1 text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 mb-6 transition-colors"
             >
                 <ChevronLeft className="h-5 w-5" />
                 Back to Shop
             </Link>
 
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Checkout</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Checkout</h1>
 
             <form action={formAction}>
                 {/* Hidden cart data */}
@@ -95,11 +95,11 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Left Column - Shipping Details */}
                     <div className="card-fresh">
-                        <h2 className="text-xl font-bold text-slate-900 mb-6">Shipping Details</h2>
+                        <h2 className="text-xl font-bold text-foreground mb-6">Shipping Details</h2>
 
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+                                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
                                     Email Address *
                                 </label>
                                 <input
@@ -113,7 +113,7 @@ export default function CheckoutPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="customer_name" className="block text-sm font-medium text-slate-700 mb-1">
+                                <label htmlFor="customer_name" className="block text-sm font-medium text-foreground mb-1">
                                     Full Name *
                                 </label>
                                 <input
@@ -127,7 +127,7 @@ export default function CheckoutPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
+                                <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1">
                                     Phone Number *
                                 </label>
                                 <input
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="shipping_address" className="block text-sm font-medium text-slate-700 mb-1">
+                                <label htmlFor="shipping_address" className="block text-sm font-medium text-foreground mb-1">
                                     Delivery Address *
                                 </label>
                                 <textarea
@@ -155,7 +155,7 @@ export default function CheckoutPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="city" className="block text-sm font-medium text-slate-700 mb-1">
+                                <label htmlFor="city" className="block text-sm font-medium text-foreground mb-1">
                                     City *
                                 </label>
                                 <select id="city" name="city" required className="input-fresh w-full">
@@ -182,13 +182,13 @@ export default function CheckoutPage() {
 
                     {/* Right Column - Order Summary */}
                     <div className="card-fresh h-fit lg:sticky lg:top-24">
-                        <h2 className="text-xl font-bold text-slate-900 mb-6">Order Summary</h2>
+                        <h2 className="text-xl font-bold text-foreground mb-6">Order Summary</h2>
 
                         {/* Cart Items */}
                         <div className="space-y-4 mb-6">
                             {items.map((item) => (
                                 <div key={item.product.id} className="flex items-center gap-4">
-                                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 shrink-0">
+                                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
                                         <Image
                                             src={item.product.image_url || 'https://placehold.co/64x64?text=P'}
                                             alt={item.product.name || 'Product'}
@@ -199,10 +199,10 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-medium text-slate-900 truncate text-sm">
+                                        <h3 className="font-medium text-foreground truncate text-sm">
                                             {item.product.name}
                                         </h3>
-                                        <p className="text-sm text-emerald-600 font-medium">
+                                        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                                             PKR {(item.product.price ?? 0).toLocaleString()}
                                         </p>
                                     </div>
@@ -214,19 +214,19 @@ export default function CheckoutPage() {
                         {/* Add More Items Link */}
                         <Link
                             href="/shop"
-                            className="flex items-center justify-center gap-2 w-full py-2 text-sm text-emerald-600 hover:text-emerald-700 border border-emerald-200 hover:border-emerald-300 rounded-lg transition-colors mb-4"
+                            className="flex items-center justify-center gap-2 w-full py-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-700 rounded-lg transition-colors mb-4"
                         >
                             <Plus className="h-4 w-4" />
                             Forgot something? Add more items
                         </Link>
 
                         {/* Divider */}
-                        <div className="border-t border-slate-200 my-4" />
+                        <div className="border-t border-border my-4" />
 
                         {/* Total */}
                         <div className="flex items-center justify-between mb-6">
-                            <span className="text-lg font-medium text-slate-600">Total</span>
-                            <span className="text-2xl font-bold text-emerald-600">
+                            <span className="text-lg font-medium text-muted-foreground">Total</span>
+                            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                                 PKR {total.toLocaleString()}
                             </span>
                         </div>
@@ -250,7 +250,7 @@ export default function CheckoutPage() {
                             )}
                         </button>
 
-                        <p className="text-xs text-slate-400 text-center mt-4">
+                        <p className="text-xs text-muted-foreground text-center mt-4">
                             Payment Method: Cash on Delivery (COD)
                         </p>
                     </div>

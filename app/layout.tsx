@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/navbar'
+import { FloatingCartButton } from '@/components/shop/floating-cart-btn'
 import { CartProvider } from '@/components/providers/cart-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { ThemeReset } from '@/components/layout/theme-reset'
@@ -14,8 +15,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'FastTrack - Expiry-Aware Inventory System',
-  description: 'The world\'s first expiry-aware live inventory system for modern retail.',
+  title: 'NOVA | Your Premier Shopping Destination',
+  description: 'Discover the best products from Northern Gifts to Electronics at NOVA.',
 }
 
 export default async function RootLayout({
@@ -45,6 +46,7 @@ export default async function RootLayout({
           <CartProvider>
             <Navbar user={user} lowStockCount={lowStockCount} />
             <main>{children}</main>
+            <FloatingCartButton />
           </CartProvider>
         </ThemeProvider>
       </body>

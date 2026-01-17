@@ -18,6 +18,8 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
     const handleAdd = (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
+        const currentStock = product.stock_quantity ?? 0
+        if (count >= currentStock) return
         addToCart(product)
     }
 
@@ -43,20 +45,21 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
                 <button
                     type="button"
                     onClick={count === 1 ? handleRemove : handleDecrement}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 hover:border-red-300 hover:bg-red-50 text-slate-500 hover:text-red-600 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-border hover:border-red-300 hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
                     aria-label={count === 1 ? "Remove" : "Decrease"}
                 >
                     {count === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
                 </button>
 
                 {/* Count Display */}
-                <span className="w-8 text-center font-bold text-slate-900">{count}</span>
+                <span className="w-8 text-center font-bold text-foreground">{count}</span>
 
                 {/* Increment Button */}
                 <button
                     type="button"
                     onClick={handleAdd}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+                    disabled={count >= (product.stock_quantity ?? 0)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${count >= (product.stock_quantity ?? 0) ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
                     aria-label="Increase"
                 >
                     <Plus className="h-4 w-4" />
@@ -87,7 +90,7 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
             <button
                 type="button"
                 onClick={handleDecrement}
-                className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl border-2 border-slate-200 hover:border-red-300 hover:bg-red-50 text-slate-600 hover:text-red-600 transition-colors"
+                className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl border-2 border-border hover:border-red-300 hover:bg-red-50 text-foreground hover:text-red-600 transition-colors"
                 aria-label="Remove one"
             >
                 <Minus className="h-5 w-5" />
@@ -95,15 +98,16 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
 
             {/* Count Display */}
             <div className="flex-1 text-center">
-                <span className="text-lg font-bold text-slate-900">{count}</span>
-                <span className="text-xs text-slate-500 block">in cart</span>
+                <span className="text-lg font-bold text-foreground">{count}</span>
+                <span className="text-xs text-muted-foreground block">in cart</span>
             </div>
 
             {/* Increment Button */}
             <button
                 type="button"
                 onClick={handleAdd}
-                className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+                disabled={count >= (product.stock_quantity ?? 0)}
+                className={`flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl transition-colors shadow-sm ${count >= (product.stock_quantity ?? 0) ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
                 aria-label="Add one more"
             >
                 <Plus className="h-5 w-5" />

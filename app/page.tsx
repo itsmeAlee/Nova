@@ -32,17 +32,17 @@ export default async function Home() {
     <div>
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[50vh] text-center mb-8 sm:mb-16">
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-4">
-          <span className="text-emerald-600 dark:text-emerald-400">FASTTRACK</span> your shopping.
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground mb-4">
+          Discover Extraordinary Finds at <span className="italic">NOVA</span>
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
-          The world&apos;s first Expiry-Aware live inventory system.
+          From the peaks of Gilgit to the latest Tech—shop a world of premium products delivered to your doorstep.
         </p>
         <Link
           href="/shop"
           className="btn-primary text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
         >
-          Start Browsing
+          Start Shopping
         </Link>
       </section>
 

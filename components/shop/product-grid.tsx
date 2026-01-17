@@ -7,6 +7,7 @@ import { Tables } from '@/types/supabase'
 
 type Product = Tables<'products'> & {
     departments?: { name: string; slug: string } | null
+    category?: string | null
 }
 
 export function ProductGrid({ products }: { products: Product[] }) {
@@ -26,19 +27,14 @@ export function ProductGrid({ products }: { products: Product[] }) {
 
     // Client-side filtering logic
     const filteredProducts = products.filter((product) => {
-        if (selectedCategory === "All Products") return true
+        // 1. Show all if category is "All Products"
+        if (selectedCategory === "All Products") return true;
 
-        // Strict match: "Northern Gifts" === "Northern Gifts"
-        // Mapping: product.departments.name OR slug
-        const deptName = product.departments?.name
-        const deptSlug = product.departments?.slug
+        // 2. Safety Check: If product has no category, skip it
+        if (!product.category) return false;
 
-        // Handle explicit "Northern Gifts" case regardless of DB inconsistencies
-        if (selectedCategory === "Northern Gifts") {
-            return deptName === "Northern Gifts" || deptSlug === "Northern Gifts"
-        }
-
-        return deptName === selectedCategory || deptSlug === selectedCategory
+        // 3. Robust Comparison (Ignore Capitalization/Spaces)
+        return product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase();
     })
 
     return (

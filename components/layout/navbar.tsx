@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
-import { Menu, ShoppingCart, X, Home, Store, LogOut, Package, User, Settings, ChevronDown, ClipboardList } from 'lucide-react'
+import { Menu, ShoppingCart, X, Home, Store, LogOut, Package, User as UserIcon, Settings, ChevronDown, ClipboardList } from 'lucide-react'
 import { useCart } from '@/components/providers/cart-provider'
 import { createClient } from '@/utils/supabase/client'
 import { NavLink, MobileNavLink } from '@/components/layout/nav-link'
+import { User } from '@supabase/supabase-js'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,25 +19,55 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface NavbarProps {
-    user?: {
-        email?: string
-        user_metadata?: {
-            role?: string
-            first_name?: string
-            last_name?: string
-            username?: string
-        }
-    } | null
+    user?: User | null // Optional initial user state if passed from server
     lowStockCount?: number
 }
 
-export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
+export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
+    // Initialize state from prop, but allow it to drift via client-side updates
+    const [user, setUser] = useState<User | null>(initialUser as User | null)
     const { itemCount, clearCart } = useCart()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const { setTheme } = useTheme()
     const router = useRouter()
-    const supabase = createClient()
 
+    // Stable client instance to prevent effect re-running unnecessarily
+    const supabase = useMemo(() => createClient(), [])
+
+    // Sync state if server sends new data (e.g. after router.refresh())
+    useEffect(() => {
+        setUser(initialUser as User | null)
+    }, [initialUser])
+
+    // Auth State Listener
+    useEffect(() => {
+        // 1. Check active session immediately on mount
+        supabase.auth.getUser().then(({ data }) => {
+            if (data.user) {
+                // Only update if different to avoid potential flickers/loops? 
+                // Actually setUser is cheap if value is same.
+                setUser(data.user)
+            }
+        })
+
+        // 2. Setup Real-time Listener (Hybrid Sync)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            const newUser = session?.user ?? null
+
+            // A. Immediate Client Update (The Instant Fix)
+            setUser(newUser)
+
+            // B. Background Server Sync
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+                // Refresh server components to update data protected by middleware/RSC
+                router.refresh()
+            }
+        })
+
+        return () => subscription.unsubscribe()
+    }, [supabase, router])
+
+    // Derived state from the user object
     const role = user?.user_metadata?.role || 'guest'
     const isStaff = role === 'admin'
     const firstName = user?.user_metadata?.first_name
@@ -48,9 +79,11 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
         clearCart()
         // 2. Force Light Mode immediately
         setTheme('light')
-        // 3. Clear Session
+        // 3. Update State Immediately (Optimistic UI)
+        setUser(null)
+        // 4. Clear Session
         await supabase.auth.signOut()
-        // 4. Clear Cache & Redirect
+        // 5. Clear Cache & Redirect
         router.refresh()
         router.push('/login')
     }
@@ -60,8 +93,8 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
             <header className="w-full sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
                 <nav className="container mx-auto flex h-16 items-center justify-between px-4">
                     {/* Logo */}
-                    <Link href="/" className="font-extrabold tracking-tighter text-2xl italic text-emerald-600 dark:text-emerald-400">
-                        FASTTRACK
+                    <Link href="/" className="flex items-center text-2xl font-black italic tracking-tighter text-black dark:text-white uppercase hover:opacity-80 transition-opacity">
+                        NOVA
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -69,7 +102,7 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
                         <NavLink href="/" icon={Home} label="Home" />
 
                         {/* Staff Navigation */}
-                        {isStaff ? (
+                        {isStaff && (
                             <>
                                 <NavLink
                                     href="/admin"
@@ -83,8 +116,10 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
                                     label="Orders"
                                 />
                             </>
-                        ) : (
-                            // Customer Navigation
+                        )}
+
+                        {/* Customer Navigation */}
+                        {!isStaff && (
                             <NavLink href="/shop" icon={Store} label="Shop" />
                         )}
 
@@ -126,7 +161,7 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
                                     <DropdownMenuSeparator className="bg-border" />
                                     <DropdownMenuItem asChild>
                                         <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
-                                            <User className="h-4 w-4" />
+                                            <UserIcon className="h-4 w-4" />
                                             Profile
                                         </Link>
                                     </DropdownMenuItem>
@@ -282,7 +317,7 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
                                 <>
                                     <MobileNavLink
                                         href="/profile"
-                                        icon={User}
+                                        icon={UserIcon}
                                         label="Profile"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     />
@@ -310,7 +345,7 @@ export function Navbar({ user, lowStockCount = 0 }: NavbarProps) {
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className="flex items-center gap-3 px-4 py-3 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-xl transition-colors font-medium dark:text-emerald-400"
                                 >
-                                    <User className="h-5 w-5" />
+                                    <UserIcon className="h-5 w-5" />
                                     Login / Signup
                                 </Link>
                             )}

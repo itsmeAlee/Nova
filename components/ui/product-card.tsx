@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { Tables } from '@/types/supabase'
 import { AddToCartControl } from '@/components/shop/add-to-cart-control'
@@ -11,6 +12,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+    const [imageError, setImageError] = useState(false)
     const isOutOfStock = (product.stock_quantity ?? 0) === 0
 
     return (
@@ -18,10 +20,11 @@ export function ProductCard({ product }: ProductCardProps) {
             {/* Product Image */}
             <div className="relative aspect-[4/3] mb-4 overflow-hidden bg-secondary/50">
                 <Image
-                    src={product.image_url || 'https://placehold.co/400x300?text=Product'}
+                    src={imageError ? 'https://placehold.co/400x300?text=No+Image' : (product.image_url || 'https://placehold.co/400x300?text=Product')}
                     alt={product.name || 'Product'}
                     fill
                     unoptimized
+                    onError={() => setImageError(true)}
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 />

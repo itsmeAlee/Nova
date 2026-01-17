@@ -109,7 +109,7 @@ export function RestockDialog({ products }: RestockDialogProps) {
                                                 ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
                                                 : prod.stock_quantity < 10
                                                     ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
-                                                    : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+                                                    : 'bg-muted text-muted-foreground'
                                                 }`}>
                                                 {prod.stock_quantity} in stock
                                             </span>

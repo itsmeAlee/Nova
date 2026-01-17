@@ -21,10 +21,10 @@ export default function Error({
             <div className="p-4 bg-red-50 rounded-full mb-6">
                 <AlertCircle className="h-10 w-10 text-red-600" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
                 Something went wrong!
             </h2>
-            <p className="text-slate-500 max-w-md mb-8">
+            <p className="text-muted-foreground max-w-md mb-8">
                 We apologize for the inconvenience. An unexpected error occurred while processing your request.
             </p>
 
@@ -38,7 +38,7 @@ export default function Error({
                 </button>
                 <Link
                     href="/"
-                    className="px-6 py-2 border border-slate-200 hover:border-emerald-300 hover:text-emerald-600 text-slate-600 rounded-xl transition-colors font-medium flex items-center justify-center"
+                    className="px-6 py-2 border border-border hover:border-emerald-300 hover:text-emerald-600 text-muted-foreground rounded-xl transition-colors font-medium flex items-center justify-center"
                 >
                     Back to Home
                 </Link>

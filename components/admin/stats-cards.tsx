@@ -35,8 +35,8 @@ export function StatsCards({ products, orders }: StatsCardsProps) {
                     <DollarSign className="h-6 w-6 text-emerald-600" />
                 </div>
                 <div>
-                    <p className="text-sm text-slate-500">Total Revenue</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-2xl font-bold text-foreground">
                         PKR {totalRevenue.toLocaleString()}
                     </p>
                 </div>
@@ -48,7 +48,7 @@ export function StatsCards({ products, orders }: StatsCardsProps) {
                     <PackageX className="h-6 w-6 text-orange-600" />
                 </div>
                 <div>
-                    <p className="text-sm text-slate-500">Low Stock Alert</p>
+                    <p className="text-sm text-muted-foreground">Low Stock Alert</p>
                     <p className="text-2xl font-bold text-orange-600">
                         {lowStockCount} {lowStockCount === 1 ? 'item' : 'items'}
                     </p>

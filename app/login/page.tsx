@@ -21,11 +21,10 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">
             <div className="w-full max-w-md">
-                {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-block">
-                        <h1 className="font-extrabold tracking-tighter text-4xl italic text-emerald-600">
-                            FASTTRACK
+                        <h1 className="font-extrabold tracking-tighter text-4xl italic text-black dark:text-white">
+                            NOVA
                         </h1>
                     </Link>
                     <p className="text-muted-foreground mt-2">
@@ -102,7 +101,7 @@ export default function LoginPage() {
                                             id="login-email"
                                             name="email"
                                             required
-                                            placeholder={selectedRole === 'admin' ? "staff@fasttrack.pk" : "you@example.com"}
+                                            placeholder={selectedRole === 'admin' ? "staff@nova.pk" : "you@example.com"}
                                             className="input-fresh w-full pl-10"
                                         />
                                     </div>
@@ -211,7 +210,7 @@ export default function LoginPage() {
                                             id="signup-email"
                                             name="email"
                                             required
-                                            placeholder={selectedRole === 'admin' ? "staff@fasttrack.pk" : "you@example.com"}
+                                            placeholder={selectedRole === 'admin' ? "staff@nova.pk" : "you@example.com"}
                                             className="input-fresh w-full pl-10"
                                         />
                                     </div>

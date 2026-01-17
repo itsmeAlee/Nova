@@ -34,27 +34,27 @@ export function InventoryTable({ products }: InventoryTableProps) {
             <div className="overflow-x-auto">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="border-b border-slate-200">
-                            <th className="px-4 py-3 text-sm font-semibold text-slate-600">Name</th>
-                            <th className="px-4 py-3 text-sm font-semibold text-slate-600">Department</th>
-                            <th className="px-4 py-3 text-sm font-semibold text-slate-600">Price</th>
-                            <th className="px-4 py-3 text-sm font-semibold text-slate-600">Stock</th>
-                            <th className="px-4 py-3 text-sm font-semibold text-slate-600">Expiry Date</th>
+                        <tr className="border-b border-border">
+                            <th className="px-4 py-3 text-sm font-semibold text-muted-foreground">Name</th>
+                            <th className="px-4 py-3 text-sm font-semibold text-muted-foreground">Department</th>
+                            <th className="px-4 py-3 text-sm font-semibold text-muted-foreground">Price</th>
+                            <th className="px-4 py-3 text-sm font-semibold text-muted-foreground">Stock</th>
+                            <th className="px-4 py-3 text-sm font-semibold text-muted-foreground">Expiry Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {products.map((product) => (
                             <tr
                                 key={product.id}
-                                className={`border-b border-slate-100 transition-colors ${isExpiringSoon(product.expiry_date)
-                                    ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500'
-                                    : 'hover:bg-slate-50'
+                                className={`border-b border-border transition-colors ${isExpiringSoon(product.expiry_date)
+                                    ? 'bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 border-l-4 border-l-red-500'
+                                    : 'hover:bg-muted/50'
                                     }`}
                             >
-                                <td className="px-4 py-3 text-sm font-medium text-slate-900">
+                                <td className="px-4 py-3 text-sm font-medium text-foreground">
                                     {product.name || 'Unnamed Product'}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-slate-500">
+                                <td className="px-4 py-3 text-sm text-muted-foreground">
                                     {product.department_id ? `Dept ${product.department_id}` : '—'}
                                 </td>
                                 <td className="px-4 py-3 text-sm price-tag">
@@ -67,8 +67,8 @@ export function InventoryTable({ products }: InventoryTableProps) {
                                     {product.stock_quantity ?? 0}
                                 </td>
                                 <td className={`px-4 py-3 text-sm ${isExpiringSoon(product.expiry_date)
-                                    ? 'text-red-700 font-medium'
-                                    : 'text-slate-500'
+                                    ? 'text-red-700 dark:text-red-400 font-medium'
+                                    : 'text-muted-foreground'
                                     }`}>
                                     {formatDate(product.expiry_date)}
                                 </td>
@@ -76,7 +76,7 @@ export function InventoryTable({ products }: InventoryTableProps) {
                         ))}
                         {products.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                                     No products found
                                 </td>
                             </tr>

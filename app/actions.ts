@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/server'
 
 interface CartItem {
     product: {
@@ -25,9 +26,14 @@ export async function placeOrder(
     try {
         const supabase = await createServerSupabaseClient()
 
+        // Get current user (if logged in)
+        const authClient = await createClient()
+        const { data: { user } } = await authClient.auth.getUser()
+
         // Log all form data for debugging
         console.log('=== CHECKOUT FORM DATA ===')
         console.log(Object.fromEntries(formData))
+        console.log('User ID:', user?.id || 'Guest')
         console.log('==========================')
 
         // Extract form data with EXACT field names
@@ -73,6 +79,7 @@ export async function placeOrder(
                 total_amount: totalAmount,
                 status: 'completed',
                 payment_method: 'COD',
+                user_id: user?.id || null, // Save user_id if logged in
             })
             .select('id')
             .single()
@@ -107,6 +114,7 @@ export async function placeOrder(
         revalidatePath('/admin')
         revalidatePath('/shop')
         revalidatePath('/')
+        revalidatePath('/my-orders')
 
         return {
             success: true,

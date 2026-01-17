@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
 import { Tables } from '@/types/supabase'
 
 type Product = Tables<'products'>
@@ -14,8 +14,10 @@ interface CartContextType {
     items: CartItem[]
     addToCart: (product: Product) => void
     removeFromCart: (productId: number) => void
+    decrementItem: (productId: number) => void
     updateQuantity: (productId: number, quantity: number) => void
     clearCart: () => void
+    getItemCount: (productId: number) => number
     total: number
     itemCount: number
 }
@@ -48,7 +50,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     }, [items, isHydrated])
 
-    const addToCart = (product: Product) => {
+    const addToCart = useCallback((product: Product) => {
         setItems((current) => {
             const existingIndex = current.findIndex((item) => item.product.id === product.id)
             if (existingIndex >= 0) {
@@ -63,15 +65,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
             // Add new item
             return [...current, { product, quantity: 1 }]
         })
-    }
+    }, [])
 
-    const removeFromCart = (productId: number) => {
+    const removeFromCart = useCallback((productId: number) => {
         setItems((current) => current.filter((item) => item.product.id !== productId))
-    }
+    }, [])
 
-    const updateQuantity = (productId: number, quantity: number) => {
+    // Decrement: if qty > 1 decrease, if qty == 1 remove
+    const decrementItem = useCallback((productId: number) => {
+        setItems((current) => {
+            const item = current.find((i) => i.product.id === productId)
+            if (!item) return current
+
+            if (item.quantity <= 1) {
+                // Remove item
+                return current.filter((i) => i.product.id !== productId)
+            }
+
+            // Decrease quantity
+            return current.map((i) =>
+                i.product.id === productId ? { ...i, quantity: i.quantity - 1 } : i
+            )
+        })
+    }, [])
+
+    const updateQuantity = useCallback((productId: number, quantity: number) => {
         if (quantity <= 0) {
-            removeFromCart(productId)
+            setItems((current) => current.filter((item) => item.product.id !== productId))
             return
         }
         setItems((current) =>
@@ -79,11 +99,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 item.product.id === productId ? { ...item, quantity } : item
             )
         )
-    }
+    }, [])
 
-    const clearCart = () => {
+    const clearCart = useCallback(() => {
         setItems([])
-    }
+    }, [])
+
+    const getItemCount = useCallback((productId: number): number => {
+        const item = items.find((i) => i.product.id === productId)
+        return item?.quantity || 0
+    }, [items])
 
     const total = items.reduce(
         (sum, item) => sum + (item.product.price ?? 0) * item.quantity,
@@ -98,8 +123,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 items,
                 addToCart,
                 removeFromCart,
+                decrementItem,
                 updateQuantity,
                 clearCart,
+                getItemCount,
                 total,
                 itemCount,
             }}

@@ -1,10 +1,8 @@
 'use client'
 
-import { ShoppingCart, Check } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
 import { Tables } from '@/types/supabase'
-import { useCart } from '@/components/providers/cart-provider'
+import { AddToCartControl } from '@/components/shop/add-to-cart-control'
 
 type Product = Tables<'products'>
 
@@ -13,15 +11,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-    const { addToCart } = useCart()
-    const [added, setAdded] = useState(false)
     const isOutOfStock = (product.stock_quantity ?? 0) === 0
-
-    const handleAddToCart = () => {
-        addToCart(product)
-        setAdded(true)
-        setTimeout(() => setAdded(false), 1500)
-    }
 
     return (
         <div className="card-fresh group flex flex-col h-full">
@@ -33,7 +23,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     fill
                     unoptimized
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 />
                 {isOutOfStock && (
                     <div className="absolute top-2 right-2 status-expired">
@@ -47,36 +37,24 @@ export function ProductCard({ product }: ProductCardProps) {
                 <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">
                     Dept {product.department_id || '—'}
                 </p>
-                <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2">
+                <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2 text-sm md:text-base">
                     {product.name || 'Unnamed Product'}
                 </h3>
-                <p className="text-2xl font-bold price-tag mt-auto mb-4">
+                <p className="text-xl md:text-2xl font-bold price-tag mt-auto mb-4">
                     PKR {(product.price ?? 0).toLocaleString()}
                 </p>
 
-                {/* Add to Cart Button */}
-                <button
-                    onClick={handleAddToCart}
-                    disabled={isOutOfStock || added}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${added
-                            ? 'bg-emerald-500 text-white'
-                            : isOutOfStock
-                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                : 'bg-slate-100 text-slate-700 hover:bg-emerald-500 hover:text-white'
-                        }`}
-                >
-                    {added ? (
-                        <>
-                            <Check className="h-5 w-5" />
-                            Added!
-                        </>
-                    ) : (
-                        <>
-                            <ShoppingCart className="h-5 w-5" />
-                            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-                        </>
-                    )}
-                </button>
+                {/* Smart Add to Cart Control */}
+                {isOutOfStock ? (
+                    <button
+                        disabled
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium bg-slate-100 text-slate-400 cursor-not-allowed"
+                    >
+                        Out of Stock
+                    </button>
+                ) : (
+                    <AddToCartControl product={product} />
+                )}
             </div>
         </div>
     )

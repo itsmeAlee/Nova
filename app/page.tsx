@@ -1,8 +1,21 @@
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/server'
 import { ProductCard } from '@/components/ui/product-card'
+import { AdminHome } from '@/components/admin/admin-home'
 
 export default async function Home() {
+  // 1. Get Current User & Role
+  const supabaseAuth = await createClient()
+  const { data: { user } } = await supabaseAuth.auth.getUser()
+  const role = user?.user_metadata?.role
+
+  // 2. IF STAFF -> Show Admin Dashboard
+  if (role === 'admin') {
+    return <AdminHome />
+  }
+
+  // 3. OTHERWISE -> Show Customer/Guest Marketing Page
   const supabase = await createServerSupabaseClient()
 
   // Fetch newest 3 products

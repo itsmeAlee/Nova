@@ -4,15 +4,16 @@ import { useActionState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { ShoppingBag, Trash2, ChevronLeft, Plus } from 'lucide-react'
+import { ShoppingBag, ChevronLeft, Plus } from 'lucide-react'
 import { useCart } from '@/components/providers/cart-provider'
 import { placeOrder } from '@/app/actions'
+import { AddToCartControl } from '@/components/shop/add-to-cart-control'
 
 const initialState = { success: false, message: '' }
 
 export default function CheckoutPage() {
     const router = useRouter()
-    const { items, removeFromCart, updateQuantity, clearCart, total } = useCart()
+    const { items, clearCart, total } = useCart()
     const [state, formAction, isPending] = useActionState(placeOrder, initialState)
 
     // Clear cart on successful order
@@ -186,7 +187,7 @@ export default function CheckoutPage() {
                         {/* Cart Items */}
                         <div className="space-y-4 mb-6">
                             {items.map((item) => (
-                                <div key={item.product.id} className="flex gap-4">
+                                <div key={item.product.id} className="flex items-center gap-4">
                                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                                         <Image
                                             src={item.product.image_url || 'https://placehold.co/64x64?text=P'}
@@ -198,31 +199,14 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-medium text-slate-900 truncate">
+                                        <h3 className="font-medium text-slate-900 truncate text-sm">
                                             {item.product.name}
                                         </h3>
-                                        <p className="text-sm text-slate-500">
-                                            PKR {(item.product.price ?? 0).toLocaleString()} × {item.quantity}
+                                        <p className="text-sm text-emerald-600 font-medium">
+                                            PKR {(item.product.price ?? 0).toLocaleString()}
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <select
-                                            value={item.quantity}
-                                            onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value))}
-                                            className="input-fresh py-1 px-2 text-sm"
-                                        >
-                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                                                <option key={n} value={n}>{n}</option>
-                                            ))}
-                                        </select>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeFromCart(item.product.id)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
+                                    <AddToCartControl product={item.product} variant="compact" />
                                 </div>
                             ))}
                         </div>

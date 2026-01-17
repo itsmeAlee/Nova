@@ -8,7 +8,7 @@ import { Menu, ShoppingCart, X, Home, Store, LogOut, Package, User as UserIcon, 
 import { useCart } from '@/components/providers/cart-provider'
 import { createClient } from '@/utils/supabase/client'
 import { NavLink, MobileNavLink } from '@/components/layout/nav-link'
-import { User } from '@supabase/supabase-js'
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -42,7 +42,7 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
     // Auth State Listener
     useEffect(() => {
         // 1. Check active session immediately on mount
-        supabase.auth.getUser().then(({ data }) => {
+        supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => {
             if (data.user) {
                 // Only update if different to avoid potential flickers/loops? 
                 // Actually setUser is cheap if value is same.
@@ -51,7 +51,7 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
         })
 
         // 2. Setup Real-time Listener (Hybrid Sync)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
             const newUser = session?.user ?? null
 
             // A. Immediate Client Update (The Instant Fix)

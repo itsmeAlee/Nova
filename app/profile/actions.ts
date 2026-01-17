@@ -21,46 +21,34 @@ export async function updateProfile(
             return { success: false, message: 'You must be logged in to update your profile.' }
         }
 
-        // 2. Extract form data
+        // 2. Extract form data (ONLY first_name and last_name are editable)
         const firstName = formData.get('first_name') as string
         const lastName = formData.get('last_name') as string
-        const username = formData.get('username') as string
 
         // 3. Validate
-        if (!firstName || !lastName || !username) {
-            return { success: false, message: 'Please fill in all required fields.' }
+        if (!firstName || !lastName) {
+            return { success: false, message: 'Please fill in your first and last name.' }
         }
 
-        // Username validation (lowercase, alphanumeric, underscores)
-        const usernameRegex = /^[a-z0-9_]+$/
-        if (!usernameRegex.test(username)) {
-            return { success: false, message: 'Username can only contain lowercase letters, numbers, and underscores.' }
-        }
-
-        // 4. Update profiles table
+        // 4. Update profiles table (ONLY first_name and last_name - username is locked)
         const { error } = await supabase
             .from('profiles')
             .update({
                 first_name: firstName,
                 last_name: lastName,
-                username: username.toLowerCase(),
             })
             .eq('id', user.id)
 
         if (error) {
             console.error('Profile update error:', error)
-            if (error.code === '23505') {
-                return { success: false, message: 'This username is already taken.' }
-            }
             return { success: false, message: 'Failed to update profile. Please try again.' }
         }
 
-        // 5. Also update user_metadata in auth
+        // 5. Also update user_metadata in auth (for navbar display)
         await supabase.auth.updateUser({
             data: {
                 first_name: firstName,
                 last_name: lastName,
-                username: username.toLowerCase(),
             }
         })
 

@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { createClient } from '@/utils/supabase/server'
 import { ProductCard } from '@/components/ui/product-card'
-import { AdminHome } from '@/components/admin/admin-home'
+import { DashboardView } from '@/components/admin/dashboard-view'
+import { getDashboardStats } from '@/app/admin/analytics'
 
 export default async function Home() {
   // 1. Get Current User & Role
@@ -10,9 +11,10 @@ export default async function Home() {
   const { data: { user } } = await supabaseAuth.auth.getUser()
   const role = user?.user_metadata?.role
 
-  // 2. IF STAFF -> Show Admin Dashboard
+  // 2. IF STAFF -> Show Admin Dashboard with preloaded data
   if (role === 'admin') {
-    return <AdminHome />
+    const initialStats = await getDashboardStats('7d')
+    return <DashboardView initialStats={initialStats} />
   }
 
   // 3. OTHERWISE -> Show Customer/Guest Marketing Page
@@ -29,10 +31,10 @@ export default async function Home() {
     <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center min-h-[50vh] text-center mb-16">
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-4">
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">
           <span className="text-emerald-600">FASTTRACK</span> your shopping.
         </h1>
-        <p className="text-lg md:text-xl text-slate-500 max-w-2xl mb-8">
+        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mb-8">
           The world&apos;s first Expiry-Aware live inventory system.
         </p>
         <Link
@@ -46,7 +48,7 @@ export default async function Home() {
       {/* Featured Products Section */}
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Fresh Arrivals</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Fresh Arrivals</h2>
           <Link
             href="/shop"
             className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
@@ -59,7 +61,7 @@ export default async function Home() {
             <ProductCard key={product.id} product={product} />
           ))}
           {(!featuredProducts || featuredProducts.length === 0) && (
-            <div className="col-span-full text-center py-12 text-slate-500">
+            <div className="col-span-full text-center py-12 text-slate-500 dark:text-slate-400">
               No products available yet
             </div>
           )}

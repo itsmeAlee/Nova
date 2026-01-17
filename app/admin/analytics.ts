@@ -2,18 +2,21 @@
 
 import { createClient } from '@/utils/supabase/server'
 
+export type TimeRange = '24h' | '7d' | '30d' | '90d'
+
 export interface DashboardStats {
     totalRevenue: number
     ordersToday: number
     lowStockCount: number
+    totalProducts: number
     criticalStockItems: Array<{
         id: string
         name: string
         stock_quantity: number
         department_name: string
     }>
-    recentSalesTrend: Array<{
-        date: string
+    salesTrend: Array<{
+        label: string
         revenue: number
     }>
     recentOrders: Array<{
@@ -21,13 +24,79 @@ export interface DashboardStats {
         customer_name: string
         total_amount: number
         created_at: string
+        status: string
     }>
 }
 
-export async function getDashboardStats(): Promise<DashboardStats> {
-    const supabase = await createClient()
+function getDateRangeStart(range: TimeRange): Date {
+    const now = new Date()
+    switch (range) {
+        case '24h':
+            return new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        case '7d':
+            return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        case '30d':
+            return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        case '90d':
+            return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+        default:
+            return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    }
+}
 
-    // 1. Total Revenue
+function formatDateLabel(date: Date, range: TimeRange): string {
+    switch (range) {
+        case '24h':
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false }) + ':00'
+        case '7d':
+        case '30d':
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        case '90d':
+            return 'W' + Math.ceil(date.getDate() / 7) + ' ' + date.toLocaleDateString('en-US', { month: 'short' })
+        default:
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    }
+}
+
+function generateEmptyBuckets(range: TimeRange): Map<string, number> {
+    const buckets = new Map<string, number>()
+    const now = new Date()
+
+    switch (range) {
+        case '24h':
+            for (let i = 23; i >= 0; i--) {
+                const d = new Date(now.getTime() - i * 60 * 60 * 1000)
+                buckets.set(formatDateLabel(d, range), 0)
+            }
+            break
+        case '7d':
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+                buckets.set(formatDateLabel(d, range), 0)
+            }
+            break
+        case '30d':
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+                buckets.set(formatDateLabel(d, range), 0)
+            }
+            break
+        case '90d':
+            for (let i = 12; i >= 0; i--) {
+                const d = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000)
+                buckets.set(formatDateLabel(d, range), 0)
+            }
+            break
+    }
+
+    return buckets
+}
+
+export async function getDashboardStats(range: TimeRange = '7d'): Promise<DashboardStats> {
+    const supabase = await createClient()
+    const rangeStart = getDateRangeStart(range)
+
+    // 1. Total Revenue (all time)
     const { data: revenueData } = await supabase
         .from('orders')
         .select('total_amount')
@@ -48,49 +117,46 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         .select('*', { count: 'exact', head: true })
         .lt('stock_quantity', 10)
 
-    // 4. Critical Stock Items (< 5)
+    // 4. Total Products
+    const { count: totalProducts } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+
+    // 5. Critical Stock Items (< 5)
     const { data: criticalStockItems } = await supabase
         .from('products')
         .select('id, name, stock_quantity, departments(name)')
         .lt('stock_quantity', 5)
         .order('stock_quantity', { ascending: true })
-        .limit(10)
+        .limit(5)
 
-    // 5. Recent Sales Trend (Last 7 Days)
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-
-    const { data: recentOrders } = await supabase
+    // 6. Sales Trend for selected range
+    const { data: rangeOrders } = await supabase
         .from('orders')
         .select('total_amount, created_at')
-        .gte('created_at', sevenDaysAgo.toISOString())
+        .gte('created_at', rangeStart.toISOString())
         .order('created_at', { ascending: true })
 
-    // Group by date
-    const dailyRevenue: Record<string, number> = {}
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date()
-        date.setDate(date.getDate() - i)
-        const dateStr = date.toISOString().split('T')[0]
-        dailyRevenue[dateStr] = 0
-    }
+    // Group orders into buckets
+    const buckets = generateEmptyBuckets(range)
 
-    recentOrders?.forEach((order) => {
-        const dateStr = new Date(order.created_at).toISOString().split('T')[0]
-        if (dailyRevenue[dateStr] !== undefined) {
-            dailyRevenue[dateStr] += order.total_amount || 0
+    rangeOrders?.forEach((order) => {
+        const orderDate = new Date(order.created_at)
+        const label = formatDateLabel(orderDate, range)
+        if (buckets.has(label)) {
+            buckets.set(label, (buckets.get(label) || 0) + (order.total_amount || 0))
         }
     })
 
-    const recentSalesTrend = Object.entries(dailyRevenue).map(([date, revenue]) => ({
-        date: new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+    const salesTrend = Array.from(buckets.entries()).map(([label, revenue]) => ({
+        label,
         revenue,
     }))
 
-    // 6. Recent Orders List
+    // 7. Recent Orders List
     const { data: latestOrders } = await supabase
         .from('orders')
-        .select('id, customer_name, total_amount, created_at')
+        .select('id, customer_name, total_amount, created_at, status')
         .order('created_at', { ascending: false })
         .limit(5)
 
@@ -98,13 +164,20 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         totalRevenue,
         ordersToday: ordersToday || 0,
         lowStockCount: lowStockCount || 0,
+        totalProducts: totalProducts || 0,
         criticalStockItems: (criticalStockItems || []).map((item: any) => ({
             id: item.id,
             name: item.name,
             stock_quantity: item.stock_quantity,
             department_name: item.departments?.name || 'Unknown',
         })),
-        recentSalesTrend,
-        recentOrders: latestOrders || [],
+        salesTrend,
+        recentOrders: (latestOrders || []).map((order: any) => ({
+            id: order.id,
+            customer_name: order.customer_name || 'Guest',
+            total_amount: order.total_amount || 0,
+            created_at: order.created_at,
+            status: order.status || 'processing',
+        })),
     }
 }

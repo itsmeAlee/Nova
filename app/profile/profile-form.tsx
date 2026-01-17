@@ -18,7 +18,7 @@ export function ProfileForm({ email, firstName, lastName, username }: ProfileFor
         <form action={formAction} className="space-y-6">
             {/* Email (Read-only) */}
             <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Email Address
                 </label>
                 <div className="relative">
@@ -28,17 +28,17 @@ export function ProfileForm({ email, firstName, lastName, username }: ProfileFor
                         id="email"
                         value={email}
                         disabled
-                        className="input-fresh w-full pl-10 bg-slate-50 text-slate-500 cursor-not-allowed"
+                        className="input-fresh w-full pl-10 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
                     />
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                    Email is tied to your account and cannot be changed here.
+                    Email is tied to your account and cannot be changed.
                 </p>
             </div>
 
-            {/* Username */}
+            {/* Username (Read-only / Locked) */}
             <div>
-                <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
+                <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Username
                 </label>
                 <div className="relative">
@@ -46,21 +46,20 @@ export function ProfileForm({ email, firstName, lastName, username }: ProfileFor
                     <input
                         type="text"
                         id="username"
-                        name="username"
-                        defaultValue={username}
-                        required
-                        pattern="[a-z0-9_]+"
-                        title="Lowercase letters, numbers, and underscores only"
-                        placeholder="johndoe"
-                        className="input-fresh w-full pl-10"
+                        value={username}
+                        disabled
+                        className="input-fresh w-full pl-10 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
                     />
                 </div>
+                <p className="text-xs text-slate-400 mt-1">
+                    Username cannot be changed after account creation.
+                </p>
             </div>
 
-            {/* Name Fields Row */}
+            {/* Name Fields Row (Editable) */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="first_name" className="block text-sm font-medium text-slate-700 mb-1">
+                    <label htmlFor="first_name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                         First Name
                     </label>
                     <input
@@ -70,11 +69,11 @@ export function ProfileForm({ email, firstName, lastName, username }: ProfileFor
                         defaultValue={firstName}
                         required
                         placeholder="John"
-                        className="input-fresh w-full"
+                        className="input-fresh w-full dark:bg-slate-800 dark:border-slate-600 dark:text-white"
                     />
                 </div>
                 <div>
-                    <label htmlFor="last_name" className="block text-sm font-medium text-slate-700 mb-1">
+                    <label htmlFor="last_name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                         Last Name
                     </label>
                     <input
@@ -84,7 +83,7 @@ export function ProfileForm({ email, firstName, lastName, username }: ProfileFor
                         defaultValue={lastName}
                         required
                         placeholder="Doe"
-                        className="input-fresh w-full"
+                        className="input-fresh w-full dark:bg-slate-800 dark:border-slate-600 dark:text-white"
                     />
                 </div>
             </div>
@@ -92,8 +91,8 @@ export function ProfileForm({ email, firstName, lastName, username }: ProfileFor
             {/* Status Messages */}
             {state?.message && (
                 <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${state.success
-                        ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-                        : 'bg-red-50 border border-red-200 text-red-700'
+                        ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
                     }`}>
                     {state.success && <CheckCircle className="h-4 w-4" />}
                     {state.message}

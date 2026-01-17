@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/navbar'
 import { CartProvider } from '@/components/providers/cart-provider'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 import { createClient } from '@/utils/supabase/server'
 
 const inter = Inter({
@@ -24,12 +25,14 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <CartProvider>
-          <Navbar user={user} />
-          <main>{children}</main>
-        </CartProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100`}>
+        <ThemeProvider>
+          <CartProvider>
+            <Navbar user={user} />
+            <main>{children}</main>
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

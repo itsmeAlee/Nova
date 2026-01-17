@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { Suspense } from 'react'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { ProductCard } from '@/components/ui/product-card'
 import { SearchInput } from '@/components/shop/search-input'
+import { CategoryFilter, CategorySidebar } from '@/components/shop/category-filter'
 
 interface ShopPageProps {
     searchParams: Promise<{ category?: string; search?: string }>
@@ -18,22 +18,25 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         .select('*')
         .order('name')
 
+    // Parse categories (comma-separated)
+    const categories = category?.split(',').filter(Boolean) || []
+
     // Build products query
     let query = supabase
         .from('products')
         .select('*, departments(name, slug)')
 
-    // Apply category filter if specified
-    if (category && category !== 'all') {
-        // Find department ID first
-        const { data: dept } = await supabase
+    // Apply category filter if specified (multi-select support)
+    if (categories.length > 0) {
+        // Find department IDs for selected slugs
+        const { data: selectedDepts } = await supabase
             .from('departments')
             .select('id')
-            .eq('slug', category)
-            .single()
+            .in('slug', categories)
 
-        if (dept) {
-            query = query.eq('department_id', dept.id)
+        if (selectedDepts && selectedDepts.length > 0) {
+            const deptIds = selectedDepts.map(d => d.id)
+            query = query.in('department_id', deptIds)
         }
     }
 
@@ -45,51 +48,37 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     // Execute query
     const { data: products } = await query.order('created_at', { ascending: false })
 
-    // Get current category name for header
-    const currentCategory = category && category !== 'all'
-        ? departments?.find(d => d.slug === category)?.name || 'All Products'
+    // Get current category names for header
+    const selectedCategoryNames = categories.length > 0
+        ? departments?.filter(d => categories.includes(d.slug)).map(d => d.name).join(', ') || 'Filtered'
         : 'All Products'
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row gap-8">
-                {/* Sidebar */}
-                <aside className="w-full md:w-64 shrink-0">
-                    <div className="card-fresh sticky top-24">
-                        <h2 className="font-bold text-slate-900 mb-4">Browse Categories</h2>
-                        <nav className="space-y-1">
-                            {/* All Products Link */}
-                            <Link
-                                href="/shop"
-                                className={`block px-3 py-2 rounded-lg text-sm transition-colors ${!category || category === 'all'
-                                        ? 'bg-emerald-100 text-emerald-800 font-medium'
-                                        : 'text-slate-600 hover:text-emerald-600'
-                                    }`}
-                            >
-                                All Products
-                            </Link>
+            {/* Mobile: Search + Filter */}
+            <div className="md:hidden mb-6">
+                <Suspense fallback={<div className="input-fresh w-full py-3 animate-pulse bg-slate-100" />}>
+                    <SearchInput />
+                </Suspense>
+                <div className="mt-4">
+                    <Suspense fallback={null}>
+                        <CategoryFilter departments={departments || []} />
+                    </Suspense>
+                </div>
+            </div>
 
-                            {/* Dynamic Department Links */}
-                            {departments?.map((dept) => (
-                                <Link
-                                    key={dept.id}
-                                    href={`/shop?category=${dept.slug}`}
-                                    className={`block px-3 py-2 rounded-lg text-sm transition-colors ${category === dept.slug
-                                            ? 'bg-emerald-100 text-emerald-800 font-medium'
-                                            : 'text-slate-600 hover:text-emerald-600'
-                                        }`}
-                                >
-                                    {dept.name}
-                                </Link>
-                            ))}
-                        </nav>
-                    </div>
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Desktop Sidebar */}
+                <aside className="hidden md:block w-64 shrink-0">
+                    <Suspense fallback={null}>
+                        <CategorySidebar departments={departments || []} />
+                    </Suspense>
                 </aside>
 
                 {/* Main Content */}
                 <main className="flex-1">
-                    {/* Search Bar */}
-                    <div className="mb-6">
+                    {/* Desktop Search Bar */}
+                    <div className="hidden md:block mb-6">
                         <Suspense fallback={<div className="input-fresh w-full py-3 animate-pulse bg-slate-100" />}>
                             <SearchInput />
                         </Suspense>
@@ -98,19 +87,19 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                     {/* Header */}
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">{currentCategory}</h1>
+                            <h1 className="text-xl md:text-2xl font-bold text-slate-900">{selectedCategoryNames}</h1>
                             {search && (
                                 <p className="text-slate-500 text-sm mt-1">
                                     Searching for &quot;{search}&quot;
                                 </p>
                             )}
                         </div>
-                        <p className="text-slate-500">{products?.length ?? 0} items</p>
+                        <p className="text-slate-500 text-sm">{products?.length ?? 0} items</p>
                     </div>
 
-                    {/* Product Grid */}
+                    {/* Product Grid - 2 columns on mobile */}
                     {products && products.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6">
                             {products.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
@@ -123,12 +112,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                                     : 'No products found in this category.'
                                 }
                             </p>
-                            <Link
+                            <a
                                 href="/shop"
                                 className="inline-block mt-4 text-emerald-600 hover:text-emerald-700 font-medium"
                             >
                                 ← Browse all products
-                            </Link>
+                            </a>
                         </div>
                     )}
                 </main>

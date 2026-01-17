@@ -1,65 +1,74 @@
 'use client'
 
-import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
-
-// Custom debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-    const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedValue(value)
-        }, delay)
-
-        return () => {
-            clearTimeout(timer)
-        }
-    }, [value, delay])
-
-    return debouncedValue
-}
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, useTransition, useCallback } from 'react'
 
 export function SearchInput() {
-    const searchParams = useSearchParams()
-    const pathname = usePathname()
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const [value, setValue] = useState(searchParams.get('search') || '')
+    const [isPending, startTransition] = useTransition()
 
-    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
-    const debouncedSearch = useDebounce(searchTerm, 300)
-
-    // Update URL when debounced search changes
-    const updateSearchParams = useCallback(
-        (term: string) => {
-            const params = new URLSearchParams(searchParams.toString())
-
-            if (term) {
-                params.set('search', term)
-            } else {
-                params.delete('search')
-            }
-
-            // Use replace to prevent cluttering browser history
-            router.replace(`${pathname}?${params.toString()}`)
-        },
-        [searchParams, pathname, router]
-    )
-
+    // Sync state with URL if URL changes externally (e.g. Back button)
     useEffect(() => {
-        updateSearchParams(debouncedSearch)
-    }, [debouncedSearch, updateSearchParams])
+        setValue(searchParams.get('search') || '')
+    }, [searchParams])
+
+    const handleSearch = useCallback((term: string) => {
+        const params = new URLSearchParams(searchParams.toString())
+        if (term) {
+            params.set('search', term)
+        } else {
+            params.delete('search')
+        }
+
+        startTransition(() => {
+            router.replace(`/shop?${params.toString()}`, { scroll: false })
+        })
+    }, [router, searchParams])
+
+    // Debounce Effect for Auto-Type
+    useEffect(() => {
+        const currentUrlSearch = searchParams.get('search') || ''
+
+        // Only search if the value is different from what's already in the URL
+        if (value === currentUrlSearch) {
+            return
+        }
+
+        const timeoutId = setTimeout(() => {
+            handleSearch(value)
+        }, 500) // 500ms delay
+
+        return () => clearTimeout(timeoutId)
+    }, [value, searchParams, handleSearch])
 
     return (
-        <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-fresh w-full pl-10 py-3"
-            />
+        <div className="flex w-full items-center gap-2">
+            <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <input
+                    type="search"
+                    placeholder="Search products..."
+                    className="input-fresh w-full pl-10 py-3 bg-white"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            </div>
+            <button
+                type="button"
+                onClick={() => handleSearch(value)}
+                disabled={isPending}
+                className="btn-primary px-6 py-3 flex items-center gap-2 shrink-0"
+            >
+                {isPending ? (
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                    <Search className="h-4 w-4" />
+                )}
+                Search
+            </button>
         </div>
     )
 }

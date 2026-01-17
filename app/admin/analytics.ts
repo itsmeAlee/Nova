@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 
-export type TimeRange = '24h' | '7d' | '30d' | '90d'
+export type TimeRange = '1h' | '24h' | '7d' | '30d' | '90d'
 
 export interface DashboardStats {
     totalRevenue: number
@@ -31,6 +31,8 @@ export interface DashboardStats {
 function getDateRangeStart(range: TimeRange): Date {
     const now = new Date()
     switch (range) {
+        case '1h':
+            return new Date(now.getTime() - 60 * 60 * 1000)
         case '24h':
             return new Date(now.getTime() - 24 * 60 * 60 * 1000)
         case '7d':
@@ -46,6 +48,10 @@ function getDateRangeStart(range: TimeRange): Date {
 
 function formatDateLabel(date: Date, range: TimeRange): string {
     switch (range) {
+        case '1h':
+            // Group by 5-minute buckets
+            const minutes = Math.floor(date.getMinutes() / 5) * 5
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:\d{2}$/, `:${minutes.toString().padStart(2, '0')}`)
         case '24h':
             return date.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false }) + ':00'
         case '7d':
@@ -63,6 +69,13 @@ function generateEmptyBuckets(range: TimeRange): Map<string, number> {
     const now = new Date()
 
     switch (range) {
+        case '1h':
+            // 12 buckets of 5 minutes each
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getTime() - i * 5 * 60 * 1000)
+                buckets.set(formatDateLabel(d, range), 0)
+            }
+            break
         case '24h':
             for (let i = 23; i >= 0; i--) {
                 const d = new Date(now.getTime() - i * 60 * 60 * 1000)
@@ -130,7 +143,7 @@ export async function getDashboardStats(range: TimeRange = '7d'): Promise<Dashbo
         .order('stock_quantity', { ascending: true })
         .limit(5)
 
-    // 6. Sales Trend for selected range
+    // 6. Sales Trend for selected range (uses index on created_at)
     const { data: rangeOrders } = await supabase
         .from('orders')
         .select('total_amount, created_at')

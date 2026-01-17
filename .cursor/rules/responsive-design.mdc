@@ -1,0 +1,114 @@
+---
+description: Standards for UI Responsiveness and Mobile-First Design
+globs: **/*.tsx, **/*.css
+---
+# Responsive Design Standards
+
+## 1. Mobile-First Approach
+Always define the base style for mobile and scale up for larger screens:
+```tsx
+// ✅ Correct: Mobile-first
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+
+// ❌ Wrong: Desktop-first
+<div className="grid grid-cols-4 md:grid-cols-2 sm:grid-cols-1">
+```
+
+## 2. Container Standards
+
+### Graphs & Charts
+Always use `<ResponsiveContainer>` with a fixed parent height:
+```tsx
+<div className="h-[250px] sm:h-[300px] w-full min-w-0">
+    <ResponsiveContainer width="100%" height="100%">
+        {/* Chart content */}
+    </ResponsiveContainer>
+</div>
+```
+
+### Tables
+Always wrap tables in `overflow-x-auto` to prevent horizontal overflow:
+```tsx
+<div className="overflow-x-auto">
+    <table className="w-full">
+        {/* Table content */}
+    </table>
+</div>
+```
+
+### Page Containers
+Use consistent max-width and padding:
+```tsx
+<div className="w-full max-w-screen-xl mx-auto px-4 py-6 sm:py-8">
+    {/* Page content */}
+</div>
+```
+
+## 3. Touch Targets
+Buttons and inputs must be at least 44px height on mobile for accessibility:
+```tsx
+// ✅ Correct: Adequate touch target
+<Button className="h-11 sm:h-10">Click Me</Button>
+
+// Form inputs should have sufficient padding
+<Input className="py-3 sm:py-2" />
+```
+
+## 4. Layouts
+Use `flex-col` on mobile and `flex-row` on desktop for navigation/headers:
+```tsx
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <h1>Title</h1>
+    <button>Action</button>
+</div>
+```
+
+## 5. Typography Scaling
+Scale text sizes responsively:
+```tsx
+<h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+<p className="text-xs sm:text-sm text-muted-foreground">
+```
+
+## 6. Icons & Spacing
+Scale icons and spacing for mobile:
+```tsx
+<Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+<div className="p-3 sm:p-4 gap-3 sm:gap-4">
+```
+
+## 7. Cards & Components
+Use responsive padding and rounded corners:
+```tsx
+<div className="p-3 sm:p-4 rounded-lg sm:rounded-xl">
+```
+
+## 8. Navigation
+- Desktop: Horizontal navigation with dropdown menus
+- Mobile: Hamburger menu with Sheet/Drawer slide-in
+```tsx
+// Desktop nav
+<nav className="hidden md:flex items-center gap-2">
+
+// Mobile trigger
+<button className="md:hidden">
+    <Menu />
+</button>
+```
+
+## 9. Forms
+Stack form fields vertically on mobile, side-by-side on desktop:
+```tsx
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <Input name="firstName" />
+    <Input name="lastName" />
+</div>
+```
+
+## 10. Testing Breakpoints
+Tailwind breakpoints to test:
+- `sm`: 640px
+- `md`: 768px
+- `lg`: 1024px
+- `xl`: 1280px
+- `2xl`: 1536px

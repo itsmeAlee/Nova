@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 import { createClient } from '@/utils/supabase/server'
 import { ProductCard } from '@/components/ui/product-card'
 import { DashboardView } from '@/components/admin/dashboard-view'
+import { FeaturedCollection } from '@/components/home/featured-collection'
 import { getDashboardStats } from '@/app/admin/analytics'
 
 export default async function Home() {
@@ -28,13 +29,13 @@ export default async function Home() {
     .limit(3)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center min-h-[50vh] text-center mb-16">
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">
-          <span className="text-emerald-600">FASTTRACK</span> your shopping.
+      <section className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[50vh] text-center mb-8 sm:mb-16">
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-4">
+          <span className="text-emerald-600 dark:text-emerald-400">FASTTRACK</span> your shopping.
         </h1>
-        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mb-8">
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
           The world&apos;s first Expiry-Aware live inventory system.
         </p>
         <Link
@@ -45,13 +46,16 @@ export default async function Home() {
         </Link>
       </section>
 
+      {/* Northern Gifts Featured Collection Banner */}
+      <FeaturedCollection />
+
       {/* Featured Products Section */}
-      <section>
+      <section className="container mx-auto px-4 py-12 sm:py-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Fresh Arrivals</h2>
+          <h2 className="text-2xl font-bold text-foreground">Fresh Arrivals</h2>
           <Link
             href="/shop"
-            className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+            className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors"
           >
             View All →
           </Link>
@@ -61,7 +65,7 @@ export default async function Home() {
             <ProductCard key={product.id} product={product} />
           ))}
           {(!featuredProducts || featuredProducts.length === 0) && (
-            <div className="col-span-full text-center py-12 text-slate-500 dark:text-slate-400">
+            <div className="col-span-full text-center py-12 text-muted-foreground">
               No products available yet
             </div>
           )}

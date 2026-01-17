@@ -27,7 +27,7 @@ export async function login(prevState: any, formData: FormData) {
 
     const role = data.user?.user_metadata?.role
     if (role === 'admin') {
-        redirect('/admin')
+        redirect('/') // Staff lands on Smart Dashboard
     } else if (role === 'customer') {
         redirect('/shop')
     } else {
@@ -65,6 +65,16 @@ export async function signup(prevState: any, formData: FormData) {
         }
     }
 
+    const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username.toLowerCase())
+        .single()
+
+    if (existingUser) {
+        return { error: 'Username already exists' }
+    }
+
     const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -85,7 +95,7 @@ export async function signup(prevState: any, formData: FormData) {
     revalidatePath('/', 'layout')
 
     if (role === 'admin') {
-        redirect('/admin')
+        redirect('/') // Staff lands on Smart Dashboard
     } else if (role === 'customer') {
         redirect('/shop')
     } else {

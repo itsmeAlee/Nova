@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useActionState } from 'react'
 import Link from 'next/link'
-import { Mail, Lock, Loader2, Shield, User, Key } from 'lucide-react'
+import { Mail, Lock, Loader2, Shield, User, Key, AtSign } from 'lucide-react'
 import { login, signup } from '@/app/auth/actions'
 
 type AuthState = { error?: string } | null
@@ -39,8 +39,8 @@ export default function LoginPage() {
                             type="button"
                             onClick={() => setSelectedRole('customer')}
                             className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${selectedRole === 'customer'
-                                    ? 'bg-white text-emerald-600 shadow-sm border border-emerald-100'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                                ? 'bg-white text-emerald-600 shadow-sm border border-emerald-100'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
                                 }`}
                         >
                             <User className="h-4 w-4" />
@@ -50,8 +50,8 @@ export default function LoginPage() {
                             type="button"
                             onClick={() => setSelectedRole('admin')}
                             className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${selectedRole === 'admin'
-                                    ? 'bg-white text-emerald-600 shadow-sm border border-emerald-100'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                                ? 'bg-white text-emerald-600 shadow-sm border border-emerald-100'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
                                 }`}
                         >
                             <Shield className="h-4 w-4" />
@@ -67,8 +67,8 @@ export default function LoginPage() {
                                 type="button"
                                 onClick={() => setActiveTab('login')}
                                 className={`flex-1 pb-3 text-sm font-medium transition-colors ${activeTab === 'login'
-                                        ? 'text-emerald-600 border-b-2 border-emerald-600'
-                                        : 'text-slate-500 hover:text-slate-700'
+                                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                                    : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 Sign In
@@ -77,8 +77,8 @@ export default function LoginPage() {
                                 type="button"
                                 onClick={() => setActiveTab('signup')}
                                 className={`flex-1 pb-3 text-sm font-medium transition-colors ${activeTab === 'signup'
-                                        ? 'text-emerald-600 border-b-2 border-emerald-600'
-                                        : 'text-slate-500 hover:text-slate-700'
+                                    ? 'text-emerald-600 border-b-2 border-emerald-600'
+                                    : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 Create Account
@@ -147,6 +147,56 @@ export default function LoginPage() {
                         ) : (
                             <form action={signupAction} className="space-y-4">
                                 <input type="hidden" name="role" value={selectedRole} />
+
+                                {/* Name Fields Row */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label htmlFor="first_name" className="block text-sm font-medium text-slate-700 mb-1">
+                                            First Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="first_name"
+                                            name="first_name"
+                                            required
+                                            placeholder="Ali"
+                                            className="input-fresh w-full"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="last_name" className="block text-sm font-medium text-slate-700 mb-1">
+                                            Last Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="last_name"
+                                            name="last_name"
+                                            required
+                                            placeholder="Khan"
+                                            className="input-fresh w-full"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Username */}
+                                <div>
+                                    <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
+                                        Username
+                                    </label>
+                                    <div className="relative">
+                                        <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            id="username"
+                                            name="username"
+                                            required
+                                            placeholder="alikhan"
+                                            pattern="[a-z0-9_]+"
+                                            title="Lowercase letters, numbers, and underscores only"
+                                            className="input-fresh w-full pl-10"
+                                        />
+                                    </div>
+                                </div>
 
                                 <div>
                                     <label htmlFor="signup-email" className="block text-sm font-medium text-slate-700 mb-1">

@@ -42,9 +42,16 @@ export async function signup(prevState: any, formData: FormData) {
     const password = formData?.get('password') as string
     const role = formData?.get('role') as string
     const staffId = formData?.get('staffId') as string
+    const firstName = formData?.get('first_name') as string
+    const lastName = formData?.get('last_name') as string
+    const username = formData?.get('username') as string
 
     if (!formData || !email || !password) {
         return { error: 'Email and password are required.' }
+    }
+
+    if (!firstName || !lastName || !username) {
+        return { error: 'Please fill in all required fields.' }
     }
 
     if (password.length < 6) {
@@ -64,6 +71,9 @@ export async function signup(prevState: any, formData: FormData) {
         options: {
             data: {
                 role: role || 'customer',
+                first_name: firstName,
+                last_name: lastName,
+                username: username.toLowerCase(),
             },
         },
     })

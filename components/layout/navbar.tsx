@@ -83,9 +83,10 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
         setUser(null)
         // 4. Clear Session
         await supabase.auth.signOut()
-        // 5. Clear Cache & Redirect
+        // 5. FORCE REDIRECT (replace prevents back button returning to protected page)
+        router.replace('/login')
+        // 6. Clear Server Cache after redirect
         router.refresh()
-        router.push('/login')
     }
 
     return (

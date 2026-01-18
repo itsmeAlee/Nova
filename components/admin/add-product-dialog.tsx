@@ -69,7 +69,7 @@ export function AddProductDialog({ departments }: AddProductDialogProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white">
                     <Plus className="h-4 w-4 mr-2" />
                     Add New Product
                 </Button>
@@ -177,8 +177,8 @@ export function AddProductDialog({ departments }: AddProductDialogProps) {
                     {/* Status Message */}
                     {state?.message && (
                         <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${state.success
-                                ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
-                                : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+                            ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
                             }`}>
                             {state.success && <CheckCircle className="h-4 w-4" />}
                             {state.message}

@@ -47,7 +47,7 @@ export default async function AdminPage() {
                     <ChevronLeft className="h-4 w-4" />
                     Back to Dashboard
                 </Link>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
                             <Package className="h-7 w-7 text-emerald-600" />
@@ -55,8 +55,8 @@ export default async function AdminPage() {
                         </h1>
                         <p className="text-muted-foreground mt-1">Monitor and manage your products.</p>
                     </div>
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-3">
+                    {/* Action Buttons - Stack vertically on mobile */}
+                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
                         <RestockDialog products={productList} />
                         <AddProductDialog departments={departments} />
                     </div>

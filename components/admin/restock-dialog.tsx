@@ -75,7 +75,7 @@ export function RestockDialog({ products }: RestockDialogProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30">
+                <Button variant="outline" className="w-full sm:w-auto border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30">
                     <Plus className="h-4 w-4 mr-2" />
                     Restock Item
                 </Button>

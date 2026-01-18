@@ -36,19 +36,19 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
 
             {/* Product Info */}
-            <div className="flex-1 flex flex-col gap-3 p-4 pb-5">
+            <div className="flex-1 flex flex-col gap-2 p-4 pb-6">
                 {/* Product Name */}
-                <h3 className="font-semibold text-foreground line-clamp-2 text-sm md:text-base">
+                <h3 className="font-semibold text-foreground line-clamp-2 text-sm md:text-base min-h-[2.5rem] md:min-h-[3rem]">
                     {product.name || 'Unnamed Product'}
                 </h3>
 
                 {/* Price */}
-                <p className="text-xl md:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-auto">
+                <p className="text-lg md:text-xl font-bold text-emerald-600 dark:text-emerald-400">
                     PKR {(product.price ?? 0).toLocaleString()}
                 </p>
 
-                {/* Smart Add to Cart Control */}
-                <div className="mt-auto">
+                {/* Smart Add to Cart Control - with extra top margin for breathing room */}
+                <div className="mt-2 pt-2">
                     {isOutOfStock ? (
                         <button
                             disabled

@@ -85,12 +85,12 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
 
     // State B: In cart - show counter controls
     return (
-        <div className="w-full flex items-center justify-between gap-2">
+        <div className="w-full flex items-center justify-between gap-3">
             {/* Decrement Button */}
             <button
                 type="button"
                 onClick={handleDecrement}
-                className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl border-2 border-border hover:border-red-300 hover:bg-red-50 text-foreground hover:text-red-600 transition-colors"
+                className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border-2 border-border hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground hover:text-red-600 transition-colors"
                 aria-label="Remove one"
             >
                 <Minus className="h-5 w-5" />
@@ -107,7 +107,7 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
                 type="button"
                 onClick={handleAdd}
                 disabled={count >= (product.stock_quantity ?? 0)}
-                className={`flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl transition-colors shadow-sm ${count >= (product.stock_quantity ?? 0) ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
+                className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-colors shadow-sm ${count >= (product.stock_quantity ?? 0) ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
                 aria-label="Add one more"
             >
                 <Plus className="h-5 w-5" />

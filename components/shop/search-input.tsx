@@ -47,11 +47,11 @@ export function SearchInput() {
     return (
         <div className="flex w-full items-center gap-2">
             <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <input
                     type="search"
                     placeholder="Search products..."
-                    className="input-fresh w-full pl-10 py-3 bg-white"
+                    className="w-full pl-10 py-3 bg-background text-foreground border border-input rounded-xl placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />

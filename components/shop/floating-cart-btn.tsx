@@ -6,29 +6,44 @@ import Link from 'next/link';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 
 export function FloatingCartButton() {
     const { itemCount, total } = useCart();
-    const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
+    const [isMounted, setIsMounted] = useState(false);
+    const [isStaff, setIsStaff] = useState(false);
 
+    // 1. Prevent Hydration Mismatch & Check User Role
     useEffect(() => {
-        setMounted(true);
+        setIsMounted(true);
+
+        // 2. Check Role - Hide for Staff/Admin
+        const checkRole = async () => {
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user?.user_metadata?.role === 'staff' || user?.user_metadata?.role === 'admin') {
+                setIsStaff(true);
+            }
+        };
+        checkRole();
     }, []);
 
-    // Don't render if:
-    // 1. Not client-side yet (avoid hydration mismatch)
-    // 2. Cart is empty
-    // 3. User is already on the checkout page (redundant)
-    if (!mounted || itemCount === 0 || pathname === '/checkout') {
-        return null;
-    }
+    // 3. The "Kill Switch" Conditions - Return null to hide component
+    // - Not mounted yet (avoid hydration mismatch)
+    // - Cart is empty
+    // - User is Staff/Admin (they don't shop)
+    // - Already on cart or checkout page (redundant)
+    if (!isMounted) return null;
+    if (itemCount === 0) return null;
+    if (isStaff) return null;
+    if (pathname === '/cart' || pathname === '/checkout') return null;
 
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 md:bottom-8 md:right-8 md:w-auto md:left-auto animate-in slide-in-from-bottom duration-300">
             <Link href="/checkout">
                 <div className={cn(
-                    "flex items-center justify-between px-4 py-3 md:py-3 md:px-6 rounded-full shadow-2xl curse-pointer",
+                    "flex items-center justify-between px-4 py-3 md:py-3 md:px-6 rounded-full shadow-2xl cursor-pointer",
                     "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700",
                     "text-white transition-all transform hover:scale-105 active:scale-95",
                     "border border-emerald-400/30"
@@ -38,7 +53,7 @@ export function FloatingCartButton() {
                         <div className="relative">
                             <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
                             <span className="absolute -top-2 -right-2 bg-white text-emerald-600 text-[10px] md:text-xs font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full">
-                                {itemCount}
+                                {itemCount > 9 ? '9+' : itemCount}
                             </span>
                         </div>
                         <div className="flex flex-col leading-none">

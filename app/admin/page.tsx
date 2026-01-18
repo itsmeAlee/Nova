@@ -68,7 +68,7 @@ export default async function AdminPage() {
 
             {/* Inventory Table */}
             <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col gap-2 items-start sm:flex-row sm:items-center sm:justify-between mb-4">
                     <h2 className="text-xl font-bold text-foreground">All Products</h2>
                     <p className="text-sm text-muted-foreground">
                         {products.length} product{products.length !== 1 ? 's' : ''} total

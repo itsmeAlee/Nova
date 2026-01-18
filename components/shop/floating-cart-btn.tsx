@@ -6,52 +6,36 @@ import Link from 'next/link';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
 
 export function FloatingCartButton() {
     const { itemCount, total } = useCart();
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
-    const [isStaff, setIsStaff] = useState(false);
 
-    // 1. Prevent Hydration Mismatch & Check User Role
     useEffect(() => {
         setIsMounted(true);
-
-        // 2. Check Role - Hide for Staff/Admin
-        const checkRole = async () => {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user?.user_metadata?.role === 'staff' || user?.user_metadata?.role === 'admin') {
-                setIsStaff(true);
-            }
-        };
-        checkRole();
     }, []);
 
-    // === VISIBILITY RULES (Order is CRITICAL) ===
+    // === VISIBILITY RULES (Route-Based Only) ===
 
-    // Rule 1: Wait for client-side mount to prevent hydration mismatch
+    // 1. PRE-RENDER: Wait for client-side mount
     if (!isMounted) return null;
 
-    // Rule 2: SAFETY LOCK - Admin/Auth pages ALWAYS hidden (overrides everything)
-    // This check MUST happen before cart check to prevent showing on admin even with items
-    if (pathname?.startsWith('/admin') || pathname?.startsWith('/auth') || pathname?.startsWith('/login')) {
-        return null;
-    }
-
-    // Rule 3: Hide for Staff/Admin users globally (they don't shop)
-    if (isStaff) return null;
-
-    // Rule 4: Hide on Cart/Checkout pages (redundant to show there)
-    if (pathname === '/cart' || pathname === '/checkout') return null;
-
-    // Rule 5: Hide on Homepage (optional - show only in shop context)
-    if (pathname === '/') return null;
-
-    // Rule 6: Empty cart = hidden (button appears only after adding items)
+    // 2. EMPTY CART: If user has 0 items, never show
     if (itemCount === 0) return null;
 
+    // 3. URL BLOCKLIST: Hide on specific routes
+
+    // Hide on ALL Admin Dashboard pages
+    if (pathname?.startsWith('/admin')) return null;
+
+    // Hide on ALL Auth pages (Login, Signup)
+    if (pathname?.startsWith('/auth') || pathname?.startsWith('/login')) return null;
+
+    // Hide if already on Cart or Checkout
+    if (pathname === '/cart' || pathname === '/checkout') return null;
+
+    // === RENDER: Show the button ===
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 md:bottom-8 md:right-8 md:w-auto md:left-auto animate-in slide-in-from-bottom duration-300">
             <Link href="/checkout">

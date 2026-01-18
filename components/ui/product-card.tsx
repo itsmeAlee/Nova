@@ -35,24 +35,26 @@ export function ProductCard({ product }: ProductCardProps) {
                 )}
             </div>
 
-            {/* Product Info */}
-            <div className="flex-1 flex flex-col gap-2 p-4 pb-6">
-                {/* Product Name */}
-                <h3 className="font-semibold text-foreground line-clamp-2 text-sm md:text-base min-h-[2.5rem] md:min-h-[3rem]">
+            {/* Product Info - Responsive padding */}
+            <div className="flex-1 flex flex-col p-3 sm:p-4">
+                {/* Product Name - Truncatable */}
+                <h3 className="font-semibold text-foreground line-clamp-2 text-sm sm:text-base min-h-[2.25rem] sm:min-h-[2.75rem]">
                     {product.name || 'Unnamed Product'}
                 </h3>
 
-                {/* Price */}
-                <p className="text-lg md:text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                    PKR {(product.price ?? 0).toLocaleString()}
-                </p>
+                {/* Price - with min-w-0 for proper truncation */}
+                <div className="flex-1 min-w-0 mt-1">
+                    <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 truncate">
+                        PKR {(product.price ?? 0).toLocaleString()}
+                    </p>
+                </div>
 
-                {/* Smart Add to Cart Control - with extra top margin for breathing room */}
-                <div className="mt-2 pt-2">
+                {/* Add to Cart Control - Protected with responsive spacing */}
+                <div className="mt-3 pt-2">
                     {isOutOfStock ? (
                         <button
                             disabled
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium bg-muted text-muted-foreground cursor-not-allowed"
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl text-sm font-medium bg-muted text-muted-foreground cursor-not-allowed"
                         >
                             Out of Stock
                         </button>

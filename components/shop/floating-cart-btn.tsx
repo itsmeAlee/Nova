@@ -30,14 +30,13 @@ export function FloatingCartButton() {
     }, []);
 
     // 3. The "Kill Switch" Conditions - Return null to hide component
-    // - Not mounted yet (avoid hydration mismatch)
-    // - Cart is empty
-    // - User is Staff/Admin (they don't shop)
-    // - Already on cart or checkout page (redundant)
-    if (!isMounted) return null;
-    if (itemCount === 0) return null;
-    if (isStaff) return null;
-    if (pathname === '/cart' || pathname === '/checkout') return null;
+    if (!isMounted) return null;                          // Avoid hydration mismatch
+    if (itemCount === 0) return null;                     // Empty cart = hidden
+    if (isStaff) return null;                             // Staff/Admin don't shop
+
+    // 4. Route Blacklist - Hide on specific pages
+    const blockedRoutes = ['/cart', '/checkout', '/login', '/auth', '/admin'];
+    if (blockedRoutes.some(route => pathname?.startsWith(route))) return null;
 
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 md:bottom-8 md:right-8 md:w-auto md:left-auto animate-in slide-in-from-bottom duration-300">

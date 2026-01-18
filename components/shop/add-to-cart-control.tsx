@@ -83,34 +83,34 @@ export function AddToCartControl({ product, variant = 'default' }: AddToCartCont
         )
     }
 
-    // State B: In cart - show counter controls
+    // State B: In cart - show counter controls (compact for mobile)
     return (
-        <div className="w-full flex items-center justify-between gap-3">
-            {/* Decrement Button */}
+        <div className="w-full flex items-center justify-center gap-1.5 sm:gap-2">
+            {/* Decrement Button - smaller on mobile */}
             <button
                 type="button"
                 onClick={handleDecrement}
-                className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border-2 border-border hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground hover:text-red-600 transition-colors"
+                className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl border-2 border-border hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 text-foreground hover:text-red-600 transition-colors"
                 aria-label="Remove one"
             >
-                <Minus className="h-5 w-5" />
+                <Minus className="h-4 w-4" />
             </button>
 
-            {/* Count Display */}
-            <div className="flex-1 text-center">
-                <span className="text-lg font-bold text-foreground">{count}</span>
-                <span className="text-xs text-muted-foreground block">in cart</span>
+            {/* Count Display - compact layout */}
+            <div className="flex-1 text-center min-w-[3rem] max-w-[4rem]">
+                <span className="text-base sm:text-lg font-bold text-foreground">{count}</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground block leading-tight">in cart</span>
             </div>
 
-            {/* Increment Button */}
+            {/* Increment Button - smaller on mobile */}
             <button
                 type="button"
                 onClick={handleAdd}
                 disabled={count >= (product.stock_quantity ?? 0)}
-                className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-colors shadow-sm ${count >= (product.stock_quantity ?? 0) ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
+                className={`shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-colors shadow-sm ${count >= (product.stock_quantity ?? 0) ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
                 aria-label="Add one more"
             >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
             </button>
         </div>
     )

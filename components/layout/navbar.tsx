@@ -67,6 +67,20 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
         return () => subscription.unsubscribe()
     }, [supabase, router])
 
+    // Body Scroll Lock - Prevent background scrolling when mobile menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'unset'
+        }
+
+        // Cleanup: Always restore scroll on unmount
+        return () => {
+            document.body.style.overflow = 'unset'
+        }
+    }, [isMobileMenuOpen])
+
     // Derived state from the user object
     const role = user?.user_metadata?.role || 'guest'
     const isStaff = role === 'admin'

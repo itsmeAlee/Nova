@@ -29,14 +29,28 @@ export function FloatingCartButton() {
         checkRole();
     }, []);
 
-    // 3. The "Kill Switch" Conditions - Return null to hide component
-    if (!isMounted) return null;                          // Avoid hydration mismatch
-    if (itemCount === 0) return null;                     // Empty cart = hidden
-    if (isStaff) return null;                             // Staff/Admin don't shop
+    // === VISIBILITY RULES (Order is CRITICAL) ===
 
-    // 4. Route Blacklist - Hide on specific pages
-    const blockedRoutes = ['/cart', '/checkout', '/login', '/auth', '/admin'];
-    if (blockedRoutes.some(route => pathname?.startsWith(route))) return null;
+    // Rule 1: Wait for client-side mount to prevent hydration mismatch
+    if (!isMounted) return null;
+
+    // Rule 2: SAFETY LOCK - Admin/Auth pages ALWAYS hidden (overrides everything)
+    // This check MUST happen before cart check to prevent showing on admin even with items
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/auth') || pathname?.startsWith('/login')) {
+        return null;
+    }
+
+    // Rule 3: Hide for Staff/Admin users globally (they don't shop)
+    if (isStaff) return null;
+
+    // Rule 4: Hide on Cart/Checkout pages (redundant to show there)
+    if (pathname === '/cart' || pathname === '/checkout') return null;
+
+    // Rule 5: Hide on Homepage (optional - show only in shop context)
+    if (pathname === '/') return null;
+
+    // Rule 6: Empty cart = hidden (button appears only after adding items)
+    if (itemCount === 0) return null;
 
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 md:bottom-8 md:right-8 md:w-auto md:left-auto animate-in slide-in-from-bottom duration-300">

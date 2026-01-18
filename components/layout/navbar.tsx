@@ -201,6 +201,7 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center gap-2">
+                        {/* Cart Icon (customers only) */}
                         {!isStaff && (
                             <Link
                                 href="/checkout"
@@ -209,18 +210,30 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
                                 <ShoppingCart className="h-5 w-5" />
                                 {itemCount > 0 && (
                                     <span className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center text-[10px] font-bold text-white bg-emerald-500 rounded-full">
-                                        {itemCount}
+                                        {itemCount > 9 ? '9+' : itemCount}
                                     </span>
                                 )}
                             </Link>
                         )}
-                        <button
-                            type="button"
-                            onClick={() => setIsMobileMenuOpen(true)}
-                            className="p-2 text-muted-foreground hover:bg-accent rounded-lg transition-colors"
-                        >
-                            <Menu className="h-6 w-6" />
-                        </button>
+
+                        {/* Conditional: Show Login button when logged out, Hamburger when logged in */}
+                        {user ? (
+                            <button
+                                type="button"
+                                onClick={() => setIsMobileMenuOpen(true)}
+                                className="p-2 text-muted-foreground hover:bg-accent rounded-lg transition-colors"
+                                aria-label="Open menu"
+                            >
+                                <Menu className="h-6 w-6" />
+                            </button>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                            >
+                                Login
+                            </Link>
+                        )}
                     </div>
                 </nav>
             </header>
@@ -301,12 +314,7 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         />
                                     )}
-                                    <MobileNavLink
-                                        href="/checkout"
-                                        icon={ShoppingCart}
-                                        label={`Cart ${itemCount > 0 ? `(${itemCount})` : ''}`}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                    />
+                                    {/* Cart link removed - already visible in top bar */}
                                 </>
                             )}
 

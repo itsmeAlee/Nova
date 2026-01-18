@@ -36,27 +36,30 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
 
             {/* Product Info */}
-            <div className="flex-1 flex flex-col p-4 pt-0">
-                {/* DEPT Tag Removed */}
-
-                <h3 className="font-semibold text-foreground mb-2 line-clamp-2 text-sm md:text-base">
+            <div className="flex-1 flex flex-col gap-3 p-4 pb-5">
+                {/* Product Name */}
+                <h3 className="font-semibold text-foreground line-clamp-2 text-sm md:text-base">
                     {product.name || 'Unnamed Product'}
                 </h3>
-                <p className="text-xl md:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-auto mb-4">
+
+                {/* Price */}
+                <p className="text-xl md:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-auto">
                     PKR {(product.price ?? 0).toLocaleString()}
                 </p>
 
                 {/* Smart Add to Cart Control */}
-                {isOutOfStock ? (
-                    <button
-                        disabled
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium bg-muted text-muted-foreground cursor-not-allowed"
-                    >
-                        Out of Stock
-                    </button>
-                ) : (
-                    <AddToCartControl product={product} />
-                )}
+                <div className="mt-auto">
+                    {isOutOfStock ? (
+                        <button
+                            disabled
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium bg-muted text-muted-foreground cursor-not-allowed"
+                        >
+                            Out of Stock
+                        </button>
+                    ) : (
+                        <AddToCartControl product={product} />
+                    )}
+                </div>
             </div>
         </div>
     )

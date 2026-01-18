@@ -26,12 +26,24 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 const CART_STORAGE_KEY = 'fasttrack-cart'
 
-export function CartProvider({ children }: { children: ReactNode }) {
+export function CartProvider({
+    children,
+    role = 'guest'
+}: {
+    children: ReactNode
+    role?: string
+}) {
     const [items, setItems] = useState<CartItem[]>([])
     const [isHydrated, setIsHydrated] = useState(false)
 
-    // Load cart from localStorage on mount
+    // Load cart from localStorage on mount - UNLESS user is Admin/Staff
     useEffect(() => {
+        // ADMIN BLOCK: If user is staff, do NOT load persisted cart
+        if (role === 'admin' || role === 'staff') {
+            setIsHydrated(true)
+            return
+        }
+
         const stored = localStorage.getItem(CART_STORAGE_KEY)
         if (stored) {
             try {
@@ -41,7 +53,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             }
         }
         setIsHydrated(true)
-    }, [])
+    }, [role])
 
     // Save cart to localStorage whenever it changes
     useEffect(() => {
@@ -103,6 +115,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const clearCart = useCallback(() => {
         setItems([])
+        // Also nuke from localStorage to prevent stale data on next session
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(CART_STORAGE_KEY)
+        }
     }, [])
 
     const getItemCount = useCallback((productId: number): number => {

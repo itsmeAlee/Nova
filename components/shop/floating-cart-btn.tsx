@@ -12,30 +12,55 @@ export function FloatingCartButton() {
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
 
-    // Prevent Hydration Mismatch
+    // Initialize: Mount check and Storage Listener
     useEffect(() => {
         setIsMounted(true);
+
+        const handleStorageChange = () => {
+            // Force re-evaluation - in a real app checking localstorage might trigger state update
+            // Here we rely on the component re-rendering via Context, 
+            // but this listener ensures we catch external storage nukes.
+            // For now, we just ensure we are mounted. 
+            // If using a store sync, we'd call revalidate() here.
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
-    // === MASTER KILL SWITCHES (Top Priority - Order Matters!) ===
+    // ==========================================================
+    // VISIBILITY KILL SWITCH - ORDER IS CRITICAL!
+    // Each check runs sequentially. First match = hidden.
+    // ==========================================================
 
-    // 1. SSR Safety: Wait for client-side mount
+    // 1. SSR SAFETY: Wait for client-side hydration
     if (!isMounted) return null;
 
-    // 2. STRICT ROUTE BLOCKING: Check routes BEFORE cart to prevent admin leak
-    // HIDE on ALL Admin Dashboard pages
-    if (pathname?.startsWith('/admin')) return null;
+    // 2. HARD ROUTE BLOCK: Admin pages (highest priority)
+    // Uses strict startsWith to catch /admin, /admin/orders, etc.
+    if (typeof pathname === 'string' && pathname.startsWith('/admin')) {
+        return null;
+    }
 
-    // HIDE on ALL Auth pages (Login, Signup, Password Reset)
-    if (pathname?.startsWith('/auth') || pathname?.startsWith('/login')) return null;
+    // 3. HARD ROUTE BLOCK: Auth pages
+    if (typeof pathname === 'string' && (pathname.startsWith('/auth') || pathname.startsWith('/login'))) {
+        return null;
+    }
 
-    // HIDE on Cart & Checkout pages (Button is Redundant there)
-    if (pathname === '/cart' || pathname === '/checkout') return null;
+    // 4. HARD ROUTE BLOCK: Cart/Checkout (redundant to show)
+    if (pathname === '/cart' || pathname === '/checkout') {
+        return null;
+    }
 
-    // 3. EMPTY CART CHECK: Only show if items exist
-    if (itemCount === 0) return null;
+    // 5. EMPTY CART BLOCK: No items = no button
+    // This MUST be the last check to ensure empty carts are hidden everywhere else
+    if (itemCount === 0) {
+        return null;
+    }
 
-    // === RENDER: All checks passed, show the button ===
+    // ==========================================================
+    // RENDER: All visibility checks passed
+    // ==========================================================
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 md:bottom-8 md:right-8 md:w-auto md:left-auto animate-in slide-in-from-bottom duration-300">
             <Link href="/checkout">

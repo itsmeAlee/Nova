@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { Mail, Lock, Loader2, Shield, User, Key, AtSign } from 'lucide-react'
 import { login, signup } from '@/app/auth/actions'
 import { useCart } from '@/components/providers/cart-provider'
 
-type AuthState = { error?: string } | null
+type AuthState = { error?: string; success?: boolean; url?: string } | null
 type Role = 'customer' | 'admin'
 
 export default function LoginPage() {
@@ -17,6 +17,16 @@ export default function LoginPage() {
 
     const [loginState, loginAction, isLoginPending] = useActionState<AuthState, FormData>(login, null)
     const [signupState, signupAction, isSignupPending] = useActionState<AuthState, FormData>(signup, null)
+
+    // ACTION 1: Force Hard Reload on Success to clear global state
+    useEffect(() => {
+        if (loginState?.success && loginState.url) {
+            window.location.href = loginState.url
+        }
+        if (signupState?.success && signupState.url) {
+            window.location.href = signupState.url
+        }
+    }, [loginState, signupState])
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">

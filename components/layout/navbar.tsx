@@ -89,22 +89,25 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
     const hasLowStock = lowStockCount > 0
 
     const handleSignOut = async () => {
-        // 1. Clear Cart Data (state)
+        // ACTION 1: INSTANT NUKE - Clear state immediately
         clearCart()
-        // 2. Clear Cart from localStorage (prevent stale data on next login)
+
+        // Ensure LocalStorage is wiped (Sync)
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('cart-storage')
+            localStorage.removeItem('fasttrack-cart')
         }
-        // 3. Force Light Mode immediately
+
+        // Force Light Mode
         setTheme('light')
-        // 4. Update State Immediately (Optimistic UI)
         setUser(null)
-        // 5. Clear Session
+
+        // Supabase Logout (Async)
         await supabase.auth.signOut()
-        // 6. FORCE REDIRECT (replace prevents back button returning to protected page)
-        router.replace('/login')
-        // 7. Clear Server Cache after redirect
-        router.refresh()
+
+        // Navigation - FORCE HARD RELOAD
+        // router.replace('/login') <- Replaced with Hard Reload
+        window.location.href = '/login'
+        // router.refresh() <- Not needed with hard reload
     }
 
     return (

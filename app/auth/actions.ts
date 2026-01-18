@@ -27,11 +27,11 @@ export async function login(prevState: any, formData: FormData) {
 
     const role = data.user?.user_metadata?.role
     if (role === 'admin') {
-        redirect('/') // Staff lands on Smart Dashboard
+        return { success: true, url: '/' }
     } else if (role === 'customer') {
-        redirect('/shop')
+        return { success: true, url: '/shop' }
     } else {
-        redirect('/')
+        return { success: true, url: '/' }
     }
 }
 
@@ -95,11 +95,11 @@ export async function signup(prevState: any, formData: FormData) {
     revalidatePath('/', 'layout')
 
     if (role === 'admin') {
-        redirect('/') // Staff lands on Smart Dashboard
+        return { success: true, url: '/' }
     } else if (role === 'customer') {
-        redirect('/shop')
+        return { success: true, url: '/shop' }
     } else {
-        redirect('/')
+        return { success: true, url: '/' }
     }
 }
 

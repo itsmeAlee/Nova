@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/navbar'
-import { FloatingCartButton } from '@/components/shop/floating-cart-btn'
+import { FloatingCartWrapper } from '@/components/shop/floating-cart-wrapper'
 import { CartProvider } from '@/components/providers/cart-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { ThemeReset } from '@/components/layout/theme-reset'
@@ -43,10 +43,10 @@ export default async function RootLayout({
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <ThemeProvider>
           <ThemeReset />
-          <CartProvider>
+          <CartProvider role={user?.user_metadata?.role || 'guest'}>
             <Navbar user={user} lowStockCount={lowStockCount} />
             <main>{children}</main>
-            <FloatingCartButton />
+            <FloatingCartWrapper />
           </CartProvider>
         </ThemeProvider>
       </body>

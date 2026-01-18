@@ -89,17 +89,21 @@ export function Navbar({ user: initialUser, lowStockCount = 0 }: NavbarProps) {
     const hasLowStock = lowStockCount > 0
 
     const handleSignOut = async () => {
-        // 1. Clear Cart Data
+        // 1. Clear Cart Data (state)
         clearCart()
-        // 2. Force Light Mode immediately
+        // 2. Clear Cart from localStorage (prevent stale data on next login)
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('cart-storage')
+        }
+        // 3. Force Light Mode immediately
         setTheme('light')
-        // 3. Update State Immediately (Optimistic UI)
+        // 4. Update State Immediately (Optimistic UI)
         setUser(null)
-        // 4. Clear Session
+        // 5. Clear Session
         await supabase.auth.signOut()
-        // 5. FORCE REDIRECT (replace prevents back button returning to protected page)
+        // 6. FORCE REDIRECT (replace prevents back button returning to protected page)
         router.replace('/login')
-        // 6. Clear Server Cache after redirect
+        // 7. Clear Server Cache after redirect
         router.refresh()
     }
 

@@ -12,30 +12,30 @@ export function FloatingCartButton() {
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
 
+    // Prevent Hydration Mismatch
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    // === VISIBILITY RULES (Route-Based Only) ===
+    // === MASTER KILL SWITCHES (Top Priority - Order Matters!) ===
 
-    // 1. PRE-RENDER: Wait for client-side mount
+    // 1. SSR Safety: Wait for client-side mount
     if (!isMounted) return null;
 
-    // 2. EMPTY CART: If user has 0 items, never show
-    if (itemCount === 0) return null;
-
-    // 3. URL BLOCKLIST: Hide on specific routes
-
-    // Hide on ALL Admin Dashboard pages
+    // 2. STRICT ROUTE BLOCKING: Check routes BEFORE cart to prevent admin leak
+    // HIDE on ALL Admin Dashboard pages
     if (pathname?.startsWith('/admin')) return null;
 
-    // Hide on ALL Auth pages (Login, Signup)
+    // HIDE on ALL Auth pages (Login, Signup, Password Reset)
     if (pathname?.startsWith('/auth') || pathname?.startsWith('/login')) return null;
 
-    // Hide if already on Cart or Checkout
+    // HIDE on Cart & Checkout pages (Button is Redundant there)
     if (pathname === '/cart' || pathname === '/checkout') return null;
 
-    // === RENDER: Show the button ===
+    // 3. EMPTY CART CHECK: Only show if items exist
+    if (itemCount === 0) return null;
+
+    // === RENDER: All checks passed, show the button ===
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 md:bottom-8 md:right-8 md:w-auto md:left-auto animate-in slide-in-from-bottom duration-300">
             <Link href="/checkout">
